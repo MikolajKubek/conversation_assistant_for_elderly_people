@@ -1,0 +1,1 @@
+/usr/bin/c++ CMakeFiles/main.dir/main.cpp.o CMakeFiles/main.dir/interaction_loop/interaction_loop.cpp.o -o main  prompt_processor/libPromptProcessor.a

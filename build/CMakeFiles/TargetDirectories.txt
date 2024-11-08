@@ -1,0 +1,6 @@
+/home/mikolaj/cpp/altenpfleger-loop/build/CMakeFiles/main.dir
+/home/mikolaj/cpp/altenpfleger-loop/build/CMakeFiles/edit_cache.dir
+/home/mikolaj/cpp/altenpfleger-loop/build/CMakeFiles/rebuild_cache.dir
+/home/mikolaj/cpp/altenpfleger-loop/build/prompt_processor/CMakeFiles/PromptProcessor.dir
+/home/mikolaj/cpp/altenpfleger-loop/build/prompt_processor/CMakeFiles/edit_cache.dir
+/home/mikolaj/cpp/altenpfleger-loop/build/prompt_processor/CMakeFiles/rebuild_cache.dir

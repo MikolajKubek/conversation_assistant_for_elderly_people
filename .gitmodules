@@ -1,0 +1,3 @@
+[submodule "prompt_processor/inja"]
+	path = prompt_processor/inja
+	url = git@github.com:pantor/inja.git

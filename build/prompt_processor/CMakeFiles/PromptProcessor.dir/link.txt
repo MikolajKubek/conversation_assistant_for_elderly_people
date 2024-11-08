@@ -1,0 +1,2 @@
+/usr/bin/ar qc libPromptProcessor.a CMakeFiles/PromptProcessor.dir/prompt_processor.cpp.o
+/usr/bin/ranlib libPromptProcessor.a
