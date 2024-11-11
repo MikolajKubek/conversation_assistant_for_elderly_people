@@ -14,17 +14,18 @@ size_t write_callback(char *contents, size_t size, size_t nmemb, void *userp) {
 }
 
 std::string GptInterface::send_request(std::string request_body) {
+    // prepare json body for OpenAI request
     json gpt_request_json;
+    json message;
+    message["role"] = "user";
+    message["content"] = request_body;
     gpt_request_json["model"] = "gpt-4o-mini";
-    gpt_request_json["messages"] = "[{\"role\": \"user\", \"content\": \"Say this is a test!\"}]";
+    gpt_request_json["messages"] = { message };
     gpt_request_json["temperature"] = 0.7;
-    std::cout << gpt_request_json.dump() << std::endl;
+    std::string request_str = gpt_request_json.dump(0);
 
-    std::string text("{ \"model\": \"gpt-4o-mini\", \"messages\": [{\"role\": \"user\", \"content\": \"Say this is a test!\"}], \"temperature\": 0.7 }");
-
-    //curl_easy_setopt(m_curl, CURLOPT_CUSTOMREQUEST, "POST");
-    curl_easy_setopt(m_curl, CURLOPT_POSTFIELDS, text.data());
-
+    curl_easy_setopt(m_curl, CURLOPT_CUSTOMREQUEST, "POST");
+    curl_easy_setopt(m_curl, CURLOPT_POSTFIELDS, request_str.c_str());
 
     // set request headers
     struct curl_slist *list = NULL;
@@ -47,9 +48,10 @@ std::string GptInterface::send_request(std::string request_body) {
         return "Sorry, there was some error while communicating with the server";
     }
 
-    //json data = json::parse(buffer);
-    //std::cout << data << std::endl;
-
-    return buffer;
+    json response_data = json::parse(buffer);
+    std::string res_message_content;
+    response_data.at("choices").at(0).at("message").at("content").get_to(res_message_content);
+    
+    return res_message_content;
 }
 

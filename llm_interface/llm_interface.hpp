@@ -25,7 +25,8 @@ class GptInterface : LlmInterface {
                 throw 123;
             }
             curl_easy_setopt(m_curl, CURLOPT_URL, m_api_url.data());
-            curl_easy_setopt(m_curl, CURLOPT_VERBOSE, 1L);
+            // curl verbose logs
+            //curl_easy_setopt(m_curl, CURLOPT_VERBOSE, 1L);
 
         }
 
