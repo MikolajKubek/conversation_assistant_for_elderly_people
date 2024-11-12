@@ -13,5 +13,5 @@ CMakeUserPresets.json
 main
 build
 .cache
-subprojects/inja
+**subprojects/
 *.key

@@ -2,7 +2,6 @@
 #include "llm_interface/llm_interface.hpp"
 #include "prompt_processor/prompt_processor.hpp"
 #include <cstdlib>
-#include <functional>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -25,11 +24,12 @@ std::string loop_callback(std::string user_prompt, std::shared_ptr<GptInterface>
 }
 
 int main() {
-    const std::string openai_key = std::getenv("OPENAI_KEY");
-    if (openai_key.empty()) {
-        std::cout << "Please provide open ai api key";
+    const char *openai_key_raw = std::getenv("OPENAI_KEY");
+    if (!openai_key_raw) {
+        std::cout << "Please provide open ai api key" << std::endl;;
         return -1;
     }
+    std::string openai_key(openai_key_raw);
 
     GptInterface gptInterface(openai_key);
     std::shared_ptr<GptInterface> interface_ptr = std::make_shared<GptInterface>(gptInterface);
@@ -48,4 +48,3 @@ int main() {
 
     return 0;
 }
-

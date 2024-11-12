@@ -34,8 +34,8 @@ std::string GptInterface::send_request(std::string request_body) {
     list = curl_slist_append(list, "Content-Type: application/json");
     curl_easy_setopt(m_curl, CURLOPT_HTTPHEADER, list);
 
-    // save response to a buffer 
-    std::string buffer; 
+    // save response to a buffer
+    std::string buffer;
     curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &buffer);
 
@@ -51,7 +51,6 @@ std::string GptInterface::send_request(std::string request_body) {
     json response_data = json::parse(buffer);
     std::string res_message_content;
     response_data.at("choices").at(0).at("message").at("content").get_to(res_message_content);
-    
+
     return res_message_content;
 }
-
