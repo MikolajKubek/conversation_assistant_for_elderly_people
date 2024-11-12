@@ -15,10 +15,8 @@ void say(std::string text) {
 }
 
 std::string loop_callback(std::string user_prompt, std::shared_ptr<GptInterface> llm_interface) {
-    // prompt_processor merge prompt with initial template
-    // prompt_processor::prepare_prompt(user_prompt)
-    prompt_processor::render_template();
-    std::string model_response = llm_interface->send_request(user_prompt);
+    std::string user_prompt_wrapped = prompt_processor::render_template(user_prompt);
+    std::string model_response = llm_interface->send_request(user_prompt_wrapped);
     say(model_response);
     return model_response;
 }

@@ -4,9 +4,13 @@
 #include <inja.hpp>
 
 using json = nlohmann::json;
+using namespace inja;
 
-void prompt_processor::render_template() {
+std::string prompt_processor::render_template(std::string user_prompt) {
     json data;
-    data["name"] = "world";
-    std::cout << inja::render("Hello {{ name }}!", data) << std::endl;
+    data["user_prompt"] = user_prompt;
+    Environment env;
+    Template initial_interaction = env.parse_template("../prompt_processor/templates/initial_interaction.txt");
+
+    return env.render(initial_interaction, data);
 }
