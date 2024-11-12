@@ -45,6 +45,7 @@ std::string GptInterface::send_request(std::string request_body) {
 
     if (res != CURLE_OK) {
         fprintf(stderr, "send request failed with %s\n", curl_easy_strerror(res));
+        std::cout << buffer << std::endl;
         return "Sorry, there was some error while communicating with the server";
     }
 
