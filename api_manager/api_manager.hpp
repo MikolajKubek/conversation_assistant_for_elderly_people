@@ -97,4 +97,33 @@ class TimeApi: public AssistantApi {
 
 };
 
+class DateApi: public AssistantApi {
+    public:
+        DateApi(){};
+        ~DateApi(){};
+        std::string command = "getDate()";
+        void set_params(std::vector<std::string> params) {
+            if (params.size() > 0) {
+                std::cout << "expected no params but received: ";
+                for (std::string param: params) {
+                    std::cout << param << ", ";
+                }
+                std::cout << std::endl;
+            }
+        }
+        std::string call() {
+            json response;
+            auto now = std::chrono::system_clock::now();
+            auto in_time_t = std::chrono::system_clock::to_time_t(now);
+            std::stringstream ss;
+            ss << std::put_time(std::localtime(&in_time_t), "%A %Y-%m-%d %X");
+
+            response["dateTime"] = ss.str();
+
+            return response.dump(2);
+        }
+    private:
+
+};
+
 #endif //API_MANAGER

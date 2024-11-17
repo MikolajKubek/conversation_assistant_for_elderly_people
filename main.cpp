@@ -52,8 +52,10 @@ int main() {
     auto api_manager = std::make_shared<ApiManager>();
     std::unique_ptr<AssistantApi> respond_api = std::make_unique<RespondApi>();
     std::unique_ptr<AssistantApi> time_api = std::make_unique<TimeApi>();
+    std::unique_ptr<AssistantApi> date_api = std::make_unique<DateApi>();
     api_manager->register_api("respond", std::move(respond_api));
     api_manager->register_api("getTime", std::move(time_api));
+    api_manager->register_api("getDate", std::move(date_api));
 
     // Initialize interaction loop
     std::cout << "Start interacting with the assistant:" << std::endl;
