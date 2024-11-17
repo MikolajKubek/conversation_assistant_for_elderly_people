@@ -12,5 +12,22 @@ std::string prompt_processor::render_template(std::string user_prompt) {
     Environment env;
     Template initial_interaction = env.parse_template("../prompt_processor/templates/initial_interaction.txt");
 
-    return env.render(initial_interaction, data);
+    std::string rendered_template = env.render(initial_interaction, data);
+    std::cout << "Rendered followup template: " << std::endl << rendered_template << std::endl;
+
+    return rendered_template;
+
+}
+
+std::string prompt_processor::render_followup_template(std::string user_prompt, std::string followup_data) {
+    json data;
+    data["user_prompt"] = user_prompt;
+    data["followup_data"] = followup_data;
+    Environment env;
+    Template followup_interaction = env.parse_template("../prompt_processor/templates/followup_interaction.txt");
+
+    std::string rendered_template = env.render(followup_interaction, data);
+    std::cout << "Rendered followup template: " << std::endl << rendered_template << std::endl;
+
+    return rendered_template;
 }

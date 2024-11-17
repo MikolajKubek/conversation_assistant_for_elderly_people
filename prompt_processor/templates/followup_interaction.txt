@@ -4,6 +4,8 @@ You are a smart assistant of the senior citizen. You have the following APIs ava
     "respond(TEXT)"
 ]
 The user request is: "{{user_prompt}}"
+You got the additional data by calling an API which returned:
+{{followup_data}}
 If you don't have a valid answer please explain it in respond call.
 Provide the response in the following format:
 {
