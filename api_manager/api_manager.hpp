@@ -11,6 +11,8 @@
 #include <chrono>
 #include <iomanip>
 #include <nlohmann/json.hpp>
+#include <curl/curl.h>
+#include <curl/header.h>
 
 using json = nlohmann::json;
 
@@ -18,6 +20,7 @@ class AssistantApi {
     public:
         AssistantApi(){};
         ~AssistantApi(){};
+        virtual std::string get_command() = 0;
         virtual void set_params(std::vector<std::string>) = 0;
         virtual std::string call() = 0;
     private:
@@ -27,6 +30,15 @@ class ApiManager {
     public:
         ApiManager(){};
         ~ApiManager(){};
+        std::vector<std::string> get_apis() {
+            std::vector<std::string> keys;
+            for (auto it = m_api_registry.begin(); it != m_api_registry.end(); ++it) {
+                keys.push_back(it->second->get_command());
+            }
+
+            return keys;
+        }
+
         void register_api(std::string api_name, std::unique_ptr<AssistantApi> assistant_api){
            auto pair = m_api_registry.emplace(api_name, std::move(assistant_api));
            if (!pair.second) {
@@ -56,6 +68,9 @@ class RespondApi: public AssistantApi {
             return "";
         }
 
+        std::string get_command() {
+            return command;
+        }
     private:
         std::vector<std::string> m_params;
         void say(std::string text) {
@@ -93,8 +108,10 @@ class TimeApi: public AssistantApi {
 
             return response.dump(2);
         }
-    private:
 
+        std::string get_command() {
+            return command;
+        }
 };
 
 class DateApi: public AssistantApi {
@@ -122,7 +139,72 @@ class DateApi: public AssistantApi {
 
             return response.dump(2);
         }
+
+        std::string get_command() {
+            return command;
+        }
+};
+
+inline size_t write_callback(char *contents, size_t size, size_t nmemb, void *userp) {
+    ((std::string*)userp)->append((char*)contents, size * nmemb);
+    return size * nmemb;
+}
+
+class WeatherApi: public AssistantApi {
+    public:
+        WeatherApi(std::string api_key){
+            m_api_key = api_key;
+            m_curl = curl_easy_init();
+            if (!m_curl) {
+                std::cout << "failed to initialize curl" << std::endl;
+                throw 123;
+            }
+        };
+        ~WeatherApi(){
+            curl_easy_cleanup(m_curl);
+        };
+        std::string command = "getWeather(LOCATION)";
+        void set_params(std::vector<std::string> params) { 
+            m_params = params;
+        }
+        std::string call() {
+            std::string location = m_params[0].substr(0, m_params[0].length() - 1);
+            if (m_params.size() < 1) {
+                std::cout << "not enough params" << std::endl;
+                return "Error: not enough params. The API signature is " + command;
+            }
+            std::string buffer;
+            curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, write_callback);
+            curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &buffer);
+            //std::string url = m_api_url + "?q=" + m_params[0] + "&units=metric&lang=pl" + "&appid=" + m_api_key;
+            std::string url = m_api_url + "?q=" + location + "&units=metric" + "&appid=" + m_api_key;
+            curl_easy_setopt(m_curl, CURLOPT_URL, url.data());
+            CURLcode res = curl_easy_perform(m_curl);
+
+            if (res != CURLE_OK) {
+                return "The api call failed";
+            }
+
+            json response = json::parse(buffer);
+            json response_filtered;
+            response_filtered["weather_description"] = response.at("weather")[0].at("description");
+            response_filtered["temp"] = response.at("main").at("temp");
+            response_filtered["humidity"] = response.at("main").at("humidity");
+            response_filtered["pressure"] = response.at("main").at("pressure");
+            response_filtered["units"] = "metric";
+
+            return response_filtered.dump(2);
+        }
+
+        std::string get_command() {
+            return command;
+        }
     private:
+        std::string m_api_key;
+        std::string m_api_url = "api.openweathermap.org/data/2.5/weather";
+        std::vector<std::string> m_params;
+        CURL *m_curl;
+
 
 };
 
