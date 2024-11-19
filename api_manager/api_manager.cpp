@@ -30,10 +30,7 @@ std::pair<std::string, bool> ApiManager::handle_response(std::string model_respo
             continue;
         }
         // process parameters
-        if (api_data[i] == ')') {
-            if (i != (int)api_data.size() - 1) {
-                std::cout << "Closing parenthesis found in the middle of the api call but should only occurr at the end" << std::endl;
-            }
+        if (i == (int) api_data.size() - 1) {
             if (i-1 > param_start_index) {
                 api_params.push_back(api_data.substr(param_start_index, i-1));
             }
