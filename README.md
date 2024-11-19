@@ -17,10 +17,19 @@ meson setup builddir
 export OPENAI_KEY="open_ai_key_value_12345678910"
 ```
 
+2. Export OPENWEATHER_KEY env variable
+```console
+export OPENWEATHER_KEY="key_value_12345678910"
+```
+
 3. Compile the project with meson
 ```console
 cd builddir
 meson compile
+```
+4. On Raspberry pi, set the ESPEAK_DATA_PATH
+```console
+export ESPEAK_DATA_PATH=/usr/lib/aarch64-linux-gnu/espeak-ng-data
 ```
 
 4. Execute the binary
