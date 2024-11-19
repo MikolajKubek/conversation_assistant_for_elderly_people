@@ -6,6 +6,7 @@ subdir('prompt_processor')
 
 curl_dep = dependency('libcurl')
 json_dep = dependency('nlohmann_json')
+openssl_dep = dependency('openssl')
 
 executable('main', 'main.cpp',
   link_with: [
@@ -15,6 +16,7 @@ executable('main', 'main.cpp',
     ],
   dependencies: [
     curl_dep,
-    json_dep
+    json_dep,
+    openssl_dep
     ]
   )
