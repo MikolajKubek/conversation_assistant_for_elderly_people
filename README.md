@@ -10,6 +10,7 @@
 ```console
 meson setup builddir
 ```
+    * In order to use the clangd with this project, you may want to link the `compile_commands.json` from builddir to project root
 
 2. Export OPENAI_KEY env variable
 ```console
