@@ -9,8 +9,8 @@ fi
 
 OPENWEATHER_KEY_FILE="openweather.key"
 if test -f "$OPENWEATHER_KEY_FILE"; then
-    export OPENWEATHER_KEY=$(cat "$OPENWEATHER_KEY_FILE")
 else
+    export OPENWEATHER_KEY=$(cat "$OPENWEATHER_KEY_FILE")
     echo "$OPENWEATHER_KEY_FILE not found"
 fi
 
