@@ -10,14 +10,6 @@
 
 #define MAX_INTERACTOINS 2
 
-void say(std::string text) {
-    std::string command = "echo '";
-    command.append(text);
-    command.append("'");
-    command.append(" | piper --model /home/mikolaj/cpp/altenpfleger.ai/deps/piper/models/pl_PL-gosia-medium.onnx --output-raw | aplay -r 22050 -f S16_LE -t raw -");
-    std::system(command.data());
-}
-
 std::string loop_callback(std::string user_prompt, std::shared_ptr<GptInterface> llm_interface, std::shared_ptr<ApiManager> api_manager) {
     std::vector<std::string> available_apis = api_manager->get_apis();
     std::string user_prompt_wrapped = prompt_processor::render_template(user_prompt, available_apis);

@@ -52,10 +52,18 @@ class ApiManager {
 
 class RespondApi: public AssistantApi {
     public:
-        RespondApi(){};
+        RespondApi(){
+            const char *env_raw = std::getenv("MODEL_PATH");
+            if (!env_raw) {
+                std::cout << "Please provide MODEL_PATH variable" << std::endl;;
+                throw 345;
+            }
+
+            m_model_path = std::string(env_raw);
+        };
         ~RespondApi(){};
         std::string command = "respond(TEXT)";
-        void set_params(std::vector<std::string> params) { 
+        void set_params(std::vector<std::string> params) {
             m_params = params;
         }
         std::string call() {
@@ -73,11 +81,13 @@ class RespondApi: public AssistantApi {
         }
     private:
         std::vector<std::string> m_params;
+        std::string m_model_path;
         void say(std::string text) {
             std::string command = "echo '";
             command.append(text);
             command.append("'");
-            command.append(" | piper --model /home/mikolaj/cpp/altenpfleger.ai/deps/piper/models/pl_PL-gosia-medium.onnx --output-raw | aplay -r 22050 -f S16_LE -t raw -");
+            command.append(" | piper --model " + m_model_path + " --output-raw | aplay -r 22050 -f S16_LE -t raw -");
+            std::cout << command << std::endl;
             std::system(command.data());
     }
 };
@@ -164,7 +174,7 @@ class WeatherApi: public AssistantApi {
             curl_easy_cleanup(m_curl);
         };
         std::string command = "getWeather(LOCATION)";
-        void set_params(std::vector<std::string> params) { 
+        void set_params(std::vector<std::string> params) {
             m_params = params;
         }
         std::string call() {

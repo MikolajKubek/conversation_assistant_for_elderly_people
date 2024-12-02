@@ -49,6 +49,7 @@ std::string GptInterface::send_request(std::string request_body) {
         return "Sorry, there was some error while communicating with the server";
     }
 
+    //std::cout << buffer << std::endl;
     json response_data = json::parse(buffer);
     std::string res_message_content;
     response_data.at("choices").at(0).at("message").at("content").get_to(res_message_content);
