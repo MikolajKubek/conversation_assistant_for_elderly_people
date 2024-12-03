@@ -1,3 +1,4 @@
+#include "interaction_db/interaction_db.hpp"
 #include "api_manager/api_manager.hpp"
 #include "llm_interface/llm_interface.hpp"
 #include "prompt_processor/prompt_processor.hpp"
@@ -57,6 +58,8 @@ int main() {
     api_manager->register_api("getTime", std::move(time_api));
     api_manager->register_api("getDate", std::move(date_api));
     api_manager->register_api("getWeather", std::move(weather_api));
+
+    test_db_connection();
 
     // Initialize interaction loop
     std::cout << "Start interacting with the assistant:" << std::endl;
