@@ -84,7 +84,7 @@ public:
 private:
   std::vector<std::string> m_params;
   std::string m_model_path;
-  // std::shared_ptr<InteractionDb> m_db_pointer;
+  //std::shared_ptr<InteractionDb> m_database_context;
   void say(std::string text) {
     std::string command = "echo '";
     command.append(text);

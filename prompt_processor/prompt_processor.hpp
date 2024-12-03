@@ -1,6 +1,6 @@
 #ifndef PROMPT_PROCESSOR_HPP
 #define PROMPT_PROCESSOR_HPP
-#include <iostream>
+#include <string>
 #include <vector>
 
 namespace prompt_processor {
