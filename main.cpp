@@ -59,7 +59,9 @@ int main() {
     api_manager->register_api("getDate", std::move(date_api));
     api_manager->register_api("getWeather", std::move(weather_api));
 
-    test_db_connection();
+    auto interaction_db = std::make_shared<InteractionDb>();
+    interaction_db->insert("user", "Która jest godzina?");
+    interaction_db->print_current_state();
 
     // Initialize interaction loop
     std::cout << "Start interacting with the assistant:" << std::endl;
