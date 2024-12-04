@@ -57,12 +57,10 @@ int main() {
   // Initialize db context
   std::shared_ptr<InteractionDb> interaction_db =
       std::make_shared<InteractionDb>();
-  interaction_db->insert("user", "Jaki dziś dzień?");
-  interaction_db->print_current_state();
 
   // Initialize API manager
   auto api_manager = std::make_shared<ApiManager>();
-  std::unique_ptr<AssistantApi> respond_api = std::make_unique<RespondApi>();
+  std::unique_ptr<AssistantApi> respond_api = std::make_unique<RespondApi>(interaction_db);
   std::unique_ptr<AssistantApi> time_api = std::make_unique<TimeApi>();
   std::unique_ptr<AssistantApi> date_api = std::make_unique<DateApi>();
   std::unique_ptr<AssistantApi> weather_api =
@@ -82,6 +80,7 @@ int main() {
     if (prompt == "exit()") {
       break;
     }
+    interaction_db->insert("user", prompt);
     std::cout << loop_callback(prompt, interface_ptr, api_manager) << std::endl;
   }
 
