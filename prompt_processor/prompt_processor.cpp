@@ -1,5 +1,5 @@
-#include "prompt_processor.hpp"
-#include <inja.hpp>
+#include "prompt_processor/prompt_processor.hpp"
+#include "inja/inja.hpp"
 #include <iostream>
 #include <nlohmann/json.hpp>
 

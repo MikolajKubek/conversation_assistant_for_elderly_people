@@ -1,7 +1,7 @@
 #ifndef API_MANAGER_HPP
 #define API_MANAGER_HPP
 
-#include "interaction_db.hpp"
+//#include "interaction_db.hpp"
 #include <chrono>
 #include <curl/curl.h>
 #include <curl/header.h>
@@ -76,7 +76,7 @@ public:
       return "Something went wrong while calling " + command + " api";
     }
 
-    m_database_context->insert("assistant", m_params[0]);
+    //m_database_context->insert("assistant", m_params[0]);
 
     say(m_params[0]);
     return "";
@@ -87,7 +87,7 @@ public:
 private:
   std::vector<std::string> m_params;
   std::string m_model_path;
-  std::shared_ptr<InteractionDb> m_database_context;
+  //std::shared_ptr<InteractionDb> m_database_context;
   void say(std::string text) {
     std::string command = "echo '";
     command.append(text);

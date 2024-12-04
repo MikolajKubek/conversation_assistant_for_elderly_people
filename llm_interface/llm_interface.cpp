@@ -1,4 +1,4 @@
-#include "llm_interface.hpp"
+#include "llm_interface/llm_interface.hpp"
 #include <cstdio>
 #include <curl/curl.h>
 #include <curl/header.h>
