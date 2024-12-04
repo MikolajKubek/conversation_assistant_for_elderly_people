@@ -1,13 +1,21 @@
-sqlite3_dep = dependency('sqlite3')
+# Define the source files for interaction_db
+interaction_db_sources = [
+  'interaction_db.cpp',
+]
 
-interaction_db_src = ['interaction_db.cpp']
+interaction_db_includes = include_directories('.')
 
-interaction_db_lib = library(
+# Create a library or shared object for interaction_db
+interaction_db_lib = shared_library(
   'interaction_db',
-  interaction_db_src,
+  sources: interaction_db_sources,
   dependencies: [sqlite3_dep],
-  include_directories: include_directories('.'),
-  install: true
+  include_directories: interaction_db_includes,
+  install: true,
 )
 
-interaction_db_dep = declare_dependency(link_with: interaction_db_lib, include_directories: include_directories('.'))
+# Declare the dependency to be used by other subprojects
+interaction_db_dep = declare_dependency(
+  link_with: interaction_db_lib,
+  include_directories: interaction_db_includes,
+)

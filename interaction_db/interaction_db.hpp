@@ -1,5 +1,6 @@
 #ifndef INTERACTION_DB_HPP
 #define INTERACTION_DB_HPP
+
 #include <cstdlib>
 #include <iostream>
 #include <sqlite3.h>
