@@ -2,31 +2,36 @@
 
 ## Prerequisites
 ### Piper
-### Meson
 ### OpenAI API
 
 ## Installation
-1. Setup meson builddir
+1. Build CMake project
 ```console
-meson setup builddir
+mkdir build && cd build
+cmake ..
+make
 ```
-    * In order to use the clangd with this project, you may want to link the `compile_commands.json` from builddir to project root
-
-2. Export OPENAI_KEY env variable
+- In order to use the clangd with this project, you may want to link the `compile_commands.json` from build dir to the project root
 ```console
-export OPENAI_KEY="open_ai_key_value_12345678910"
-```
-
-2. Export OPENWEATHER_KEY env variable
-```console
-export OPENWEATHER_KEY="key_value_12345678910"
+ln -s build/compile_commands.json compile_commands.json
 ```
 
-3. Compile the project with meson
+2. Export env variables using `set_envs.sh`
+- OPENAI_KEY - API key for OpenAI API
+- OPENWEATHER_KEY - API key for OpenWeather
+- MODEL_PATH - model path for PIPER TTS
+
 ```console
-cd builddir
-meson compile
+source set_envs.sh
 ```
+You may need to modify the script if env values need to be extracted in a way that's different from default.
+
+3. Execute the project
+```console
+cd build
+./main
+```
+
 4. On Raspberry pi, set the ESPEAK_DATA_PATH
 ```console
 export ESPEAK_DATA_PATH=/usr/lib/aarch64-linux-gnu/espeak-ng-data

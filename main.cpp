@@ -1,5 +1,5 @@
 #include "api_manager/api_manager.hpp"
-//#include "interaction_db/interaction_db.hpp"
+#include "interaction_db/interaction_db.hpp"
 #include "llm_interface/llm_interface.hpp"
 #include "prompt_processor/prompt_processor.hpp"
 #include <cstdlib>
@@ -55,10 +55,10 @@ int main() {
       std::make_shared<GptInterface>(gptInterface);
 
   // Initialize db context
-  //std::shared_ptr<InteractionDb> interaction_db =
-  //    std::make_shared<InteractionDb>();
-  //interaction_db->insert("user", "Która jest godzina?");
-  //interaction_db->print_current_state();
+  std::shared_ptr<InteractionDb> interaction_db =
+      std::make_shared<InteractionDb>();
+  interaction_db->insert("user", "Jaki dziś dzień?");
+  interaction_db->print_current_state();
 
   // Initialize API manager
   auto api_manager = std::make_shared<ApiManager>();
