@@ -5,6 +5,7 @@
 #include <cstring>
 #include <ctime>
 #include <iomanip>
+#include <chrono>
 #include <iostream>
 #include <sqlite3.h>
 #include <string>
@@ -33,7 +34,7 @@ public:
     std::string create_statement =
         "CREATE TABLE IF NOT EXISTS \"INTERACTIONS\" ("
         "\"ID\"         INTEGER NOT NULL,"
-        "\"TIMESTAMP\"  DATETIME DEFAULT CURRENT_TIMESTAMP,"
+        "\"TIMESTAMP\"  DATETIME,"
         "\"SENDER\"     TEXT,"
         "\"VALUE\"      TEXT,"
         "PRIMARY KEY(\"ID\" AUTOINCREMENT)"
@@ -57,8 +58,13 @@ public:
   int insert(std::string sender, std::string value) {
     int exit;
     char *message_error;
-    std::string sql("INSERT INTO INTERACTIONS(SENDER, VALUE) VALUES(\"" +
-                    sender + "\", \"" + value + "\");");
+    auto now = std::chrono::system_clock::now();
+    auto in_time_t = std::chrono::system_clock::to_time_t(now);
+    std::stringstream ss;
+    ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
+
+    std::string sql("INSERT INTO INTERACTIONS(TIMESTAMP, SENDER, VALUE) VALUES(\"" +
+                    ss.str() + "\", \"" + sender + "\", \"" + value + "\");");
     exit = sqlite3_exec(DB, sql.c_str(), NULL, 0, &message_error);
 
     if (exit != SQLITE_OK) {
