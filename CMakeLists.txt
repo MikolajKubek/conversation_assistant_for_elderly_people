@@ -8,6 +8,8 @@ add_subdirectory(interaction_db)
 add_subdirectory(api_manager)
 add_subdirectory(llm_interface)
 add_subdirectory(prompt_processor)
+# Tests
+add_subdirectory(tests)
 
 add_executable(main main.cpp)
 

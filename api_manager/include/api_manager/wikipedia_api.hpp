@@ -34,7 +34,7 @@ public:
   WikipediaApi() {
     m_curl = curl_easy_init();
     if (!m_curl) {
-      std::cout << "failed to initialize curl" << std::endl;
+      std::cerr << "failed to initialize curl" << std::endl;
       throw 123;
     }
   };
@@ -45,7 +45,7 @@ public:
   std::string call() override {
     json response;
     if (m_params.size() < 1) {
-      std::cout << "not enough params" << std::endl;
+      std::cerr << "not enough params" << std::endl;
       return "Error: not enough params. The API signature is " + command;
     }
     std::string search_term = m_params[0].substr(0, m_params[0].length() - 1);
@@ -59,6 +59,7 @@ public:
         {"format", "json"},
         {"search", search_term},
         {"language", m_language}};
+    // TODO: replace spaces with %20
     std::string url =
         build_url(m_wikidata_search_entities_url, search_entities_params);
 
@@ -68,45 +69,75 @@ public:
     if (res != CURLE_OK) {
       return "The wikidata search entities api call failed";
     }
-    std::cout << "succesfully received first wikidata response" << std::endl;
+    std::cerr << "succesfully received first wikidata response" << std::endl;
+    if (buffer.empty()) {
+      return "Error: received empty response from wikidata";
+    }
 
     json search_entity_response;
     try {
       search_entity_response = json::parse(buffer);
     } catch (nlohmann::detail::parse_error) {
-      std::cout << "unable to parse the API response: " << std::endl << buffer << std::endl;
+      std::cerr << "unable to parse the API response: " << std::endl
+                << buffer << std::endl;
       return "Error: unable to parse API response";
     }
 
+    std::cerr << "successfully parsed the response" << std::endl;
+
+    if (!search_entity_response.contains("search")) {
+      std::cerr << "unable to find the search field in response json"
+                << std::endl;
+    }
+
     if (search_entity_response.at("search").size() == 0) {
-      std::cout << "searching for " << search_term
+      std::cerr << "searching for " << search_term
                 << " failed, no article found" << std::endl;
       return "Error: No article found for " + search_term;
     }
 
-    std::string wikidata_id = response["search"][0]["id"];
+    std::string wikidata_id =
+        search_entity_response.at("search").at(0).at("id");
 
     // get pl wikipedia article title associated with wikidata id
-    url = m_wikidata_entity_url + "/" + wikidata_id + "?language=pl&format=json";
+    std::map<std::string, std::string> wikidata_get_entity_props{
+        {"action", "wbgetentities"},
+        {"format", "json"},
+        {"ids", wikidata_id},
+        {"languages", "pl"},
+    };
+    url = build_url(m_wikidata_search_entities_url, wikidata_get_entity_props);
 
+    buffer.erase();
     curl_easy_setopt(m_curl, CURLOPT_URL, url.data());
     res = curl_easy_perform(m_curl);
 
     if (res != CURLE_OK) {
       return "The wikidata get entity call failed";
     }
-    std::cout << "succesfully received second wikidata response" << std::endl;
+    std::cerr << "succesfully received second wikidata response" << std::endl;
 
     json wikidata_response;
     try {
       wikidata_response = json::parse(buffer);
     } catch (nlohmann::detail::parse_error) {
-      std::cout << "unable to parse the API response: " << std::endl << buffer << std::endl;
+      std::cerr << "unable to parse the API response: " << std::endl
+                << buffer << std::endl;
       return "Error: unable to parse API response";
     }
 
-    std::string article_title =
-        wikidata_response["entities"][wikidata_id]["sitelinks"]["plwiki"]["title"];
+    std::cerr << "succesfully parsed second response" << std::endl;
+
+    json sitelinks =
+        wikidata_response.at("entities").at(wikidata_id).at("sitelinks");
+    std::string article_title;
+    if (sitelinks.contains(m_language + "wiki")) {
+      article_title = sitelinks.at(m_language + "wiki").at("title");
+    } else if (sitelinks.contains("enwiki")) {
+      article_title = sitelinks.at("enwiki").at("title");
+    } else {
+      return "Error: no article found in neither " + m_language + " nor en";
+    }
 
     // get the actual article intro
     // mediawiki api doc:
@@ -123,31 +154,34 @@ public:
 
     url = build_url(m_wikipedia_url, wikipedia_query_params);
 
+    buffer.erase();
     curl_easy_setopt(m_curl, CURLOPT_URL, url.data());
     res = curl_easy_perform(m_curl);
 
     if (res != CURLE_OK) {
+      std::cerr << res << std::endl;
       return "The wikipedia api call failed";
     }
-    std::cout << "succesfully received wikipedia response" << std::endl;
+    std::cerr << "succesfully received wikipedia response" << std::endl;
 
     json wikipedia_response;
     try {
       wikipedia_response = json::parse(buffer);
     } catch (nlohmann::detail::parse_error) {
-      std::cout << "unable to parse API response: " << std::endl << buffer << std::endl;
+      std::cerr << "unable to parse API response: " << std::endl
+                << buffer << std::endl;
       return "Error: unable to parse API response";
     }
-    json pages = wikipedia_response["query"]["pages"];
+    json pages = wikipedia_response.at("query").at("pages");
     for (auto it = pages.begin(); it != pages.end(); ++it) {
       if (it.key() == "-1") {
-        std::cout << "Error: article " << article_title << " not found"
+        std::cerr << "Error: article " << article_title << " not found"
                   << std::endl;
         return "The article of given title wasn't found";
       } else {
         json response_filtered;
-        response_filtered["title"] = article_title;
-        response_filtered["description"] = it.value()["extract"];
+        response_filtered[article_title] = it.value().at("extract");
+        return response_filtered.dump(2);
       }
     }
 
@@ -163,7 +197,7 @@ private:
   std::vector<std::string> m_params;
   std::string m_wikidata_search_entities_url =
       "https://www.wikidata.org/w/api.php";
-  std::string m_wikidata_entity_url = "http://www.wikidata.org/entity";
+  // std::string m_wikidata_entity_url = "https://www.wikidata.org/entity";
   std::string m_wikipedia_url =
       "https://" + m_language + ".wikipedia.org/w/api.php";
 };
