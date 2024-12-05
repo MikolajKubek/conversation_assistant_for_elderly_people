@@ -1,7 +1,6 @@
 #ifndef API_MANAGER_HPP
 #define API_MANAGER_HPP
 
-// #include "interaction_db.hpp"
 #include "interaction_db/interaction_db.hpp"
 #include <chrono>
 #include <curl/curl.h>
@@ -168,6 +167,7 @@ inline size_t write_callback(char *contents, size_t size, size_t nmemb,
 
 class WeatherApi : public AssistantApi {
 public:
+  std::string command = "getWeather(LOCATION)";
   WeatherApi(std::string api_key) {
     m_api_key = api_key;
     m_curl = curl_easy_init();
@@ -177,14 +177,13 @@ public:
     }
   };
   ~WeatherApi() { curl_easy_cleanup(m_curl); };
-  std::string command = "getWeather(LOCATION)";
   void set_params(std::vector<std::string> params) { m_params = params; }
   std::string call() {
-    std::string location = m_params[0].substr(0, m_params[0].length() - 1);
     if (m_params.size() < 1) {
       std::cout << "not enough params" << std::endl;
       return "Error: not enough params. The API signature is " + command;
     }
+    std::string location = m_params[0].substr(0, m_params[0].length() - 1);
     std::string buffer;
     curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &buffer);

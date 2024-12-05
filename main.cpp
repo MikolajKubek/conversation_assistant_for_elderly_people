@@ -1,4 +1,5 @@
 #include "api_manager/api_manager.hpp"
+#include "api_manager/wikipedia_api.hpp"
 #include "interaction_db/interaction_db.hpp"
 #include "llm_interface/llm_interface.hpp"
 #include "prompt_processor/prompt_processor.hpp"
@@ -66,11 +67,13 @@ int main() {
   std::unique_ptr<AssistantApi> weather_api =
       std::make_unique<WeatherApi>(openweather_key);
   std::unique_ptr<AssistantApi> previous_context_api  = std::make_unique<PreviousContextApi>(interaction_db);
+  std::unique_ptr<AssistantApi> wikipedia_api  = std::make_unique<WikipediaApi>();
   api_manager->register_api("respond", std::move(respond_api));
   api_manager->register_api("getTime", std::move(time_api));
   api_manager->register_api("getDate", std::move(date_api));
   api_manager->register_api("getWeather", std::move(weather_api));
   api_manager->register_api("getPreviousContext", std::move(previous_context_api));
+  api_manager->register_api("getWikipediaArticle", std::move(wikipedia_api));
 
   // Initialize interaction loop
   std::cout << "Start interacting with the assistant:" << std::endl;
