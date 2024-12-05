@@ -65,10 +65,12 @@ int main() {
   std::unique_ptr<AssistantApi> date_api = std::make_unique<DateApi>();
   std::unique_ptr<AssistantApi> weather_api =
       std::make_unique<WeatherApi>(openweather_key);
+  std::unique_ptr<AssistantApi> previous_context_api  = std::make_unique<PreviousContextApi>(interaction_db);
   api_manager->register_api("respond", std::move(respond_api));
   api_manager->register_api("getTime", std::move(time_api));
   api_manager->register_api("getDate", std::move(date_api));
   api_manager->register_api("getWeather", std::move(weather_api));
+  api_manager->register_api("getPreviousContext", std::move(previous_context_api));
 
   // Initialize interaction loop
   std::cout << "Start interacting with the assistant:" << std::endl;

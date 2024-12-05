@@ -9,6 +9,7 @@ You got the additional data by calling an API which returned:
 {{followup_data}}
 User prefers short and concise responses.
 If you don't have a valid answer please explain it in respond call.
+If you don't get the context of the question you may use one of the APIs to gather more context.
 Provide the response in the following format, DATA_LEARNED should be the information that you learned about the user during this interaction.
 {
     "apiToCall": API_CALL,

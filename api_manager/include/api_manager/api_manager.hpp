@@ -1,7 +1,7 @@
 #ifndef API_MANAGER_HPP
 #define API_MANAGER_HPP
 
-//#include "interaction_db.hpp"
+// #include "interaction_db.hpp"
 #include "interaction_db/interaction_db.hpp"
 #include <chrono>
 #include <curl/curl.h>
@@ -218,6 +218,55 @@ private:
   std::string m_api_url = "api.openweathermap.org/data/2.5/weather";
   std::vector<std::string> m_params;
   CURL *m_curl;
+};
+
+class PreviousContextApi : public AssistantApi {
+public:
+  PreviousContextApi(std::shared_ptr<InteractionDb> db_context) {
+    m_database_context = db_context;
+  };
+  ~PreviousContextApi() {};
+  std::string command = "getPreviousContext()";
+  void set_params(std::vector<std::string> params) {
+    if (params.size() > 0) {
+      std::cout << "expected no params but received: ";
+      for (std::string param : params) {
+        std::cout << param << ", ";
+      }
+      std::cout << std::endl;
+    }
+  }
+  std::string call() {
+    json response;
+    response["previous_conversations"] = json::array();
+
+    auto now = std::chrono::system_clock::now();
+    auto five_minutes = std::chrono::minutes(5);
+    auto time_threshold = now - five_minutes;
+    auto time_threshold_time_t = std::chrono::system_clock::to_time_t(time_threshold);
+
+    std::vector<InteractionDbRecord> records = m_database_context->select(time_threshold_time_t);
+    for (InteractionDbRecord record: records) {
+      std::string history_entry;
+      if (record.sender == "user") {
+        history_entry = "prompt: " + record.value;
+      }
+      else if (record.sender == "assistant") {
+        history_entry = "assistant: " + record.value;
+      }
+      else {
+        std::cout << "invalid record sender" << record.sender << std::endl;
+      }
+
+      response["previous_conversations"].push_back(history_entry);
+    }
+    return response.dump(2);
+  }
+
+  std::string get_command() { return command; }
+
+private:
+  std::shared_ptr<InteractionDb> m_database_context;
 };
 
 #endif // API_MANAGER
