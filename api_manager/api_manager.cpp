@@ -1,25 +1,17 @@
 #include "api_manager/api_manager.hpp"
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <string>
 #include <utility>
 #include <vector>
 using json = nlohmann::json;
 
-std::pair<std::string, bool>
-ApiManager::handle_response(std::string model_response) {
-  bool is_final = false;
-  std::string api_data;
+std::pair<std::string, std::vector<std::string>>
+ApiManager::read_api_params(std::string api_data) {
   std::string api_name;
   std::vector<std::string> api_params;
-
-  json response_json = json::parse(model_response);
-  response_json.at("apiToCall").get_to(api_data);
-
-  std::cout << "got response: " << api_data << std::endl;
-
   bool api_name_found = false;
   int param_start_index = 0;
-  // TODO: export to a separate function and unit test
   for (int i = 0; i < (int)api_data.size(); i++) {
     if (api_data[i] == '(' && !api_name_found) {
       api_name = api_data.substr(0, i);
@@ -47,6 +39,23 @@ ApiManager::handle_response(std::string model_response) {
     std::cout << s << ", ";
   }
   std::cout << std::endl;
+
+  return std::make_pair(api_name, api_params);
+}
+
+std::pair<std::string, bool>
+ApiManager::handle_response(std::string model_response) {
+  bool is_final = false;
+  std::string api_data;
+
+  json response_json = json::parse(model_response);
+  response_json.at("apiToCall").get_to(api_data);
+
+  std::cout << "got response: " << api_data << std::endl;
+
+  auto api_data_serialized = read_api_params(api_data);
+  std::string api_name = api_data_serialized.first;
+  std::vector<std::string> api_params = api_data_serialized.second;
 
   auto assistant_iterator = m_api_registry.find(api_name);
   if (assistant_iterator == m_api_registry.end()) {

@@ -10,7 +10,7 @@
 #include <utility>
 #include <vector>
 
-#define MAX_INTERACTOINS 2
+#define MAX_INTERACTOINS 4
 
 std::string loop_callback(std::string user_prompt,
                           std::shared_ptr<GptInterface> llm_interface,

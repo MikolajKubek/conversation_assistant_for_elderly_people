@@ -49,6 +49,7 @@ public:
     }
   };
   std::pair<std::string, bool> handle_response(std::string model_response);
+  static std::pair<std::string, std::vector<std::string>> read_api_params(std::string api_data);
 
 private:
   std::map<std::string, std::unique_ptr<AssistantApi>> m_api_registry;

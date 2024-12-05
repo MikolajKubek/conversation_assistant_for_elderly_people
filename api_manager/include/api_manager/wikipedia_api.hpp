@@ -3,11 +3,57 @@
 
 #include "api_manager/api_manager.hpp"
 #include "nlohmann/detail/exceptions.hpp"
+#include <codecvt>
 #include <curl/curl.h>
 #include <curl/easy.h>
 #include <iostream>
+#include <locale>
 #include <map>
+#include <regex>
 #include <string>
+#include <vector>
+
+// Function to replace Polish characters with their ASCII equivalents
+inline std::string normalizePolishCharacters(const std::string &input) {
+  // Mapping Polish characters to their ASCII equivalents
+  static const std::unordered_map<char16_t, char16_t> polishMap = {
+      {u'ą', 'a'}, {u'ć', 'c'}, {u'ę', 'e'}, {u'ł', 'l'}, {u'ń', 'n'},
+      {u'ó', 'o'}, {u'ś', 's'}, {u'ź', 'z'}, {u'ż', 'z'}, {u'Ą', 'A'},
+      {u'Ć', 'C'}, {u'Ę', 'E'}, {u'Ł', 'L'}, {u'Ń', 'N'}, {u'Ó', 'O'},
+      {u'Ś', 'S'}, {u'Ź', 'Z'}, {u'Ż', 'Z'}};
+
+  std::wstring_convert<std::codecvt_utf8<wchar_t>, wchar_t> converter;
+  std::wstring wide_string = converter.from_bytes(input);
+
+  std::string output;
+  for (char16_t c : wide_string) {
+    // Replace Polish character if found in map, otherwise keep the original
+    auto it = polishMap.find(c);
+    output += (it != polishMap.end()) ? it->second : c;
+    if (it != polishMap.end()) {
+    }
+  }
+  return output;
+}
+
+// Function to URLify the string
+inline std::string urlify(const std::string &input) {
+  // Step 1: Normalize Polish characters
+  // std::string normalized = normalizePolishCharacters(input);
+
+  // Step 2: Convert to lowercase
+  // std::transform(normalized.begin(), normalized.end(), normalized.begin(),
+                 // ::tolower);
+
+  // Step 3: Replace spaces with hyphens
+  std::string replaced =
+      std::regex_replace(input, std::regex("\\s+"), "%20");
+
+  // Step 4: Remove non-alphanumeric characters except hyphens
+  //replaced = std::regex_replace(replaced, std::regex("[^a-z0-9-]"), "");
+
+  return replaced;
+}
 
 inline std::string
 build_url(std::string base_url,
@@ -18,7 +64,7 @@ build_url(std::string base_url,
   }
   for (const auto &[key, value] : request_params) {
     params_size--;
-    base_url.append(key).append("=").append(value);
+    base_url.append(urlify(key)).append("=").append(urlify(value));
     if (params_size > 0) {
       base_url.append("&");
     }
@@ -197,7 +243,6 @@ private:
   std::vector<std::string> m_params;
   std::string m_wikidata_search_entities_url =
       "https://www.wikidata.org/w/api.php";
-  // std::string m_wikidata_entity_url = "https://www.wikidata.org/entity";
   std::string m_wikipedia_url =
       "https://" + m_language + ".wikipedia.org/w/api.php";
 };
