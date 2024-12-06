@@ -69,7 +69,7 @@ public:
     m_database_context = database_context;
   };
   ~RespondApi() {};
-  std::string command = "respond(TEXT)";
+  std::string command = "respond(\"TEXT\")";
   void set_params(std::vector<std::string> params) { m_params = params; }
   std::string call() {
     if (m_params.size() != 1) {
@@ -168,7 +168,7 @@ inline size_t write_callback(char *contents, size_t size, size_t nmemb,
 
 class WeatherApi : public AssistantApi {
 public:
-  std::string command = "getWeather(LOCATION)";
+  std::string command = "getWeather(\"LOCATION\")";
   WeatherApi(std::string api_key) {
     m_api_key = api_key;
     m_curl = curl_easy_init();

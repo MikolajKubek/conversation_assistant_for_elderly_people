@@ -1,4 +1,5 @@
 #include "api_manager/api_manager.hpp"
+#include <cctype>
 #include <iostream>
 #include <nlohmann/json.hpp>
 #include <string>
@@ -11,26 +12,38 @@ ApiManager::read_api_params(std::string api_data) {
   std::string api_name;
   std::vector<std::string> api_params;
   bool api_name_found = false;
+  bool reading_string_param = false;
   int param_start_index = 0;
-  for (int i = 0; i < (int)api_data.size(); i++) {
-    if (api_data[i] == '(' && !api_name_found) {
-      api_name = api_data.substr(0, i);
+
+  std::string current_buffer;
+  for (char c : api_data) {
+    if (!api_name_found && c == '(') {
+      api_name = current_buffer;
+      current_buffer.clear();
       api_name_found = true;
-      param_start_index = i + 1;
-    } else if (!api_name_found) {
-      // go through the string until api name is found
       continue;
     }
-    // process parameters
-    if (i == (int)api_data.size() - 1) {
-      if (i - 1 > param_start_index) {
-        api_params.push_back(api_data.substr(param_start_index, i - 1));
-      }
+
+    if (!reading_string_param && c == '"') {
+      reading_string_param = true;
+      continue;
     }
 
-    if (api_data[i] == ',' && i > 0 && api_data[i - 1] == '\'') {
-      api_params.push_back(api_data.substr(param_start_index, i));
-      param_start_index = i + 1;
+    if (reading_string_param && c == '"') {
+      reading_string_param = false;
+      continue;
+    }
+
+    if (!reading_string_param && (c == ',' || c == ')')) {
+      if (current_buffer.size() > 0) {
+        api_params.push_back(current_buffer);
+        current_buffer.clear();
+      }
+      continue;
+    }
+
+    if (!api_name_found || reading_string_param) {
+      current_buffer += c;
     }
   }
 

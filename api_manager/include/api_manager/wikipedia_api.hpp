@@ -76,7 +76,7 @@ build_url(std::string base_url,
 
 class WikipediaApi : public AssistantApi {
 public:
-  std::string command = "getWikipediaArticle(TOPIC)";
+  std::string command = "getWikipediaArticle(\"TOPIC\")";
   WikipediaApi() {
     m_curl = curl_easy_init();
     if (!m_curl) {
