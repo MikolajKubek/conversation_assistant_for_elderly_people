@@ -14,9 +14,11 @@ ApiManager::read_api_params(std::string api_data) {
   bool api_name_found = false;
   bool reading_string_param = false;
   int param_start_index = 0;
+  char current_quote = '\0';
 
   std::string current_buffer;
-  for (char c : api_data) {
+  for (int i = 0; i < api_data.size(); i++) {
+    char c = api_data[i];
     if (!api_name_found && c == '(') {
       api_name = current_buffer;
       current_buffer.clear();
@@ -24,14 +26,26 @@ ApiManager::read_api_params(std::string api_data) {
       continue;
     }
 
-    if (!reading_string_param && c == '"') {
+    if (!reading_string_param && (c == '"' || c == '\'')) {
+      current_quote = c;
       reading_string_param = true;
       continue;
     }
 
-    if (reading_string_param && c == '"') {
+    if (reading_string_param && c == current_quote) {
+      current_quote = '\0';
       reading_string_param = false;
+      api_params.push_back(current_buffer);
+      current_buffer.clear();
       continue;
+    }
+
+    if (reading_string_param && c == '\\') {
+      if (i + 1 < api_data.size() && api_data[i+1] == current_quote) {
+       current_buffer += api_data[i + 1];
+       ++i; // Skip the escaped character
+        continue;
+      }
     }
 
     if (!reading_string_param && (c == ',' || c == ')')) {

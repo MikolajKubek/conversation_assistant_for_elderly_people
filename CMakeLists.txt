@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 3.25)
 
 project(altenpfleger-loop)
 
@@ -8,6 +8,7 @@ add_subdirectory(interaction_db)
 add_subdirectory(api_manager)
 add_subdirectory(llm_interface)
 add_subdirectory(prompt_processor)
+add_subdirectory(task_scheduler)
 # Tests
 add_subdirectory(tests)
 
@@ -18,4 +19,5 @@ target_link_libraries(main
 	api_manager_lib
 	llm_interface_lib
 	prompt_processor_lib
+	task_scheduler_lib
 )
