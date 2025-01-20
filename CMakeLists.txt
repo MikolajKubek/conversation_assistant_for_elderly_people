@@ -9,6 +9,8 @@ add_subdirectory(api_manager)
 add_subdirectory(llm_interface)
 add_subdirectory(prompt_processor)
 add_subdirectory(task_scheduler)
+add_subdirectory(speech_components)
+add_subdirectory(utils)
 # Tests
 add_subdirectory(tests)
 
@@ -20,4 +22,6 @@ target_link_libraries(main
 	llm_interface_lib
 	prompt_processor_lib
 	task_scheduler_lib
+	speech_components_lib
+	utils_lib
 )

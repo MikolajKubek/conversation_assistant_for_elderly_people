@@ -16,4 +16,6 @@ target_link_libraries(tests PRIVATE Catch2::Catch2WithMain
 	api_manager_lib
 	llm_interface_lib
 	prompt_processor_lib
+	speech_components_lib
+	utils_lib
 )
