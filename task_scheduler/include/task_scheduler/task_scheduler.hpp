@@ -13,18 +13,21 @@
 #include <thread>
 #include <utility>
 #include <vector>
+#include <libcron/Cron.h>
 
-#ifndef TASK_TYPE
-#define TASK_TYPE
+libcron::Cron cron;
+
 enum TaskType {
 	NOTIFICATION,
 	ROUTINE
 };
-#endif
 
 class TaskScheduler {
 public:
-	TaskScheduler() : stop_flag(false), worker(&TaskScheduler::notification_worker, this) {}
+	TaskScheduler() : 
+		stop_flag(false),
+		worker(&TaskScheduler::notification_worker, this),
+		routine_worker_thread(&TaskScheduler::routine_worker, this) {}
 	~TaskScheduler() {
 		stop_flag = true;
 		cv.notify_all();
@@ -47,6 +50,7 @@ public:
 
 	bool has_ready_interactions() {
 		std::lock_guard<std::mutex> lock(notification_queue_mutex);
+		std::cout << "result_queue size: " << result_queue.size() << std::endl;
 		return !result_queue.empty();
 	}
 
@@ -62,7 +66,20 @@ public:
 		return EXIT_FAILURE;
 	}
 
-	int schedule_routine(std::string cron_schedule, int id);
+	int schedule_routine(std::string cron_schedule, int id, std::string routine_text) {
+		std::cout << "scheduling a routine " << routine_text << std::endl;
+		if (!cron.add_schedule(routine_text, cron_schedule, [=](auto&) {
+			std::cout << "routine called: " << routine_text << std::endl;
+			std::lock_guard<std::mutex> lock(notification_queue_mutex);
+			result_queue.push(std::make_pair(TaskType::ROUTINE, routine_text));
+		})) {
+			return EXIT_FAILURE;
+		}
+
+		std::cout << "amount of scheduled routines: " << cron.count() << std::endl;
+
+		return EXIT_SUCCESS;
+	}
 	int cancel_routine(int id);
 private:
 	struct Notification {
@@ -75,6 +92,7 @@ private:
 	};
 	std::atomic<bool> stop_flag;
 	std::thread worker;
+	std::thread routine_worker_thread;
 	std::condition_variable cv;
 	std::mutex notification_queue_mutex;
 	std::queue<std::pair<TaskType, std::string>> result_queue;
@@ -101,6 +119,14 @@ private:
 					cv.wait_until(lock, next_notification.trigger_time);
 				}
 			}
+		}
+	}
+
+	void routine_worker() {
+		std::cout << "start routine worker" << std::endl;
+		while (!stop_flag) {
+			cron.tick();
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		}
 	}
 };

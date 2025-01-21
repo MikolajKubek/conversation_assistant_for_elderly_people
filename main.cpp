@@ -1,6 +1,7 @@
 #include "api_manager/api_manager.hpp"
 #include "api_manager/wikipedia_api.hpp"
 #include "api_manager/reminder_api.hpp"
+#include "api_manager/routine_api.hpp"
 #include "interaction_db/interaction_db.hpp"
 #include "llm_interface/llm_interface.hpp"
 #include "prompt_processor/prompt_processor.hpp"
@@ -66,6 +67,7 @@ int main() {
 
   std::shared_ptr<TaskScheduler> task_scheduler = std::make_shared<TaskScheduler>();
   task_scheduler->schedule_notification(1, "halo halo test");
+  task_scheduler->schedule_routine("0 30 * * * ?", 1, "test routine");
 
   // Initialize API manager
   auto api_manager = std::make_shared<ApiManager>();
@@ -77,6 +79,7 @@ int main() {
   std::unique_ptr<AssistantApi> previous_context_api  = std::make_unique<PreviousContextApi>(interaction_db);
   std::unique_ptr<AssistantApi> wikipedia_api  = std::make_unique<WikipediaApi>();
   std::unique_ptr<AssistantApi> reminder_api = std::make_unique<ReminderApi>(task_scheduler);
+  std::unique_ptr<AssistantApi> routine_api = std::make_unique<RoutineApi>(task_scheduler);
   api_manager->register_api("respond", std::move(respond_api));
   api_manager->register_api("getTime", std::move(time_api));
   api_manager->register_api("getDate", std::move(date_api));
@@ -84,6 +87,7 @@ int main() {
   api_manager->register_api("getPreviousContext", std::move(previous_context_api));
   api_manager->register_api("getWikipediaArticle", std::move(wikipedia_api));
   api_manager->register_api("setReminder", std::move(reminder_api));
+  api_manager->register_api("setUpRoutine", std::move(routine_api));
 
   SdlClient sdl_client = SdlClient();
   Uint8* recording_buffer = new Uint8[sdl_client.get_buffer_size()];
@@ -113,6 +117,10 @@ int main() {
       task_scheduler->pop_ready_notification(task_type, notification);
       if (task_type == TaskType::NOTIFICATION) {
         std::cout << "notification" << std::endl;
+        std::cout << notification << std::endl;
+      }
+      else {
+        std::cout << "routine" << std::endl;
         std::cout << notification << std::endl;
       }
     }
