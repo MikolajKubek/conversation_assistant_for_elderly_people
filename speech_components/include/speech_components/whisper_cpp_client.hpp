@@ -1,7 +1,10 @@
 #include <SDL_stdinc.h>
+#include <algorithm>
 #include <cctype>
 #include <cstddef>
+#include <cstdio>
 #include <cstdlib>
+#include <cwctype>
 #include <iostream>
 #include <ostream>
 #include <speech_components/asr_clients.hpp>
@@ -28,21 +31,13 @@ public:
   ~WhisperClient() { whisper_free(m_ctx); }
 
   std::string transcribe(Uint8 *buffer, size_t buffer_len) override {
-    std::cout << "here whisper" << std::endl;
-    for (int i = 0; i < buffer_len; i++) {
-      std::cout << buffer[i] << ", ";
-    }
-    std::cout << std::endl;
-    std::cout << "here whisper2" << std::endl;
     std::vector<float> converted_data(buffer_len);
     convert_input_data(buffer, buffer_len, converted_data);
-    std::cout << "here whisper3" << std::endl;
 
-    if (!whisper_full(m_ctx, m_params, converted_data.data(), buffer_len)) {
+    if (whisper_full(m_ctx, m_params, converted_data.data(), buffer_len) != 0) {
       std::cout << "ERROR: failed to process audio" << std::endl;
       throw 333;
     }
-    std::cout << "here whisper4" << std::endl;
 
     int num_segments = whisper_full_n_segments(m_ctx);
 
@@ -51,6 +46,7 @@ public:
     for (int i = 0; i < num_segments; i++) {
       const char *text = whisper_full_get_segment_text(m_ctx, i);
       std::string segment_text(text);
+      ltrim(segment_text);
 
       if (!isalpha(segment_text[0])) {
         std::cout << "WARN: segment doesn't start with a letter, segment: "
@@ -70,6 +66,12 @@ private:
   std::string m_lang = "pl";
   whisper_context *m_ctx;
   whisper_full_params m_params;
+
+  inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+        return !std::isspace(ch);
+    }));
+  }
 
   int convert_input_data(Uint8 *buffer, size_t buffer_len,
                          std::vector<float> &converted_data) {
