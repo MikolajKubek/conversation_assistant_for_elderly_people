@@ -70,7 +70,7 @@ ApiManager::read_api_params(std::string api_data) {
   return std::make_pair(api_name, api_params);
 }
 
-std::pair<std::string, bool>
+HandleResponseResult
 ApiManager::handle_response(std::string model_response) {
   bool is_final = false;
   std::string api_data;
@@ -87,7 +87,7 @@ ApiManager::handle_response(std::string model_response) {
   auto assistant_iterator = m_api_registry.find(api_name);
   if (assistant_iterator == m_api_registry.end()) {
     std::cout << "Suitable api not available" << std::endl;
-    return std::make_pair("Requested api: " + api_name + "wasn't found", true);
+    return HandleResponseResult(api_name, "Requested api wasn't found", true);
   }
 
   assistant_iterator->second->set_params(api_params);
@@ -96,5 +96,5 @@ ApiManager::handle_response(std::string model_response) {
     is_final = true;
   }
 
-  return std::make_pair(response, is_final);
+  return HandleResponseResult(api_name, response, is_final);
 }

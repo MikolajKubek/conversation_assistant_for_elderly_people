@@ -28,6 +28,17 @@ public:
 private:
 };
 
+struct HandleResponseResult {
+  std::string api_called;
+  std::string api_response;
+  bool is_final;
+
+  HandleResponseResult(std::string api_called, std::string api_response,
+                       bool is_final)
+      : api_called(api_called), api_response(api_response), is_final(is_final) {
+  }
+};
+
 class ApiManager {
 public:
   ApiManager() {};
@@ -48,8 +59,9 @@ public:
       std::cout << "unable to register api" << api_name << std::endl;
     }
   };
-  std::pair<std::string, bool> handle_response(std::string model_response);
-  static std::pair<std::string, std::vector<std::string>> read_api_params(std::string api_data);
+  HandleResponseResult handle_response(std::string model_response);
+  static std::pair<std::string, std::vector<std::string>>
+  read_api_params(std::string api_data);
 
 private:
   std::map<std::string, std::unique_ptr<AssistantApi>> m_api_registry;
@@ -243,18 +255,18 @@ public:
     auto now = std::chrono::system_clock::now();
     auto five_minutes = std::chrono::minutes(5);
     auto time_threshold = now - five_minutes;
-    auto time_threshold_time_t = std::chrono::system_clock::to_time_t(time_threshold);
+    auto time_threshold_time_t =
+        std::chrono::system_clock::to_time_t(time_threshold);
 
-    std::vector<InteractionDbRecord> records = m_database_context->select(time_threshold_time_t);
-    for (InteractionDbRecord record: records) {
+    std::vector<InteractionDbRecord> records =
+        m_database_context->select(time_threshold_time_t);
+    for (InteractionDbRecord record : records) {
       std::string history_entry;
       if (record.sender == "user") {
         history_entry = "prompt: " + record.value;
-      }
-      else if (record.sender == "assistant") {
+      } else if (record.sender == "assistant") {
         history_entry = "assistant: " + record.value;
-      }
-      else {
+      } else {
         std::cout << "invalid record sender" << record.sender << std::endl;
       }
 

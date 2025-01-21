@@ -28,14 +28,14 @@ std::string loop_callback(std::string user_prompt,
 
   int interaction_counter = 0;
   auto processed_response = api_manager->handle_response(model_response);
-  bool is_final = processed_response.second;
+  bool is_final = processed_response.is_final;
   while (!is_final && interaction_counter < MAX_INTERACTOINS) {
     interaction_counter++;
     user_prompt_wrapped = prompt_processor::render_followup_template(
-        user_prompt, processed_response.first, available_apis);
+        user_prompt, processed_response.api_response, available_apis);
     model_response = llm_interface->send_request(user_prompt_wrapped);
     processed_response = api_manager->handle_response(model_response);
-    is_final = processed_response.second;
+    is_final = processed_response.is_final;
   }
 
   return model_response;
@@ -89,15 +89,15 @@ int main() {
   api_manager->register_api("setReminder", std::move(reminder_api));
   api_manager->register_api("setUpRoutine", std::move(routine_api));
 
-  SdlClient sdl_client = SdlClient();
-  Uint8* recording_buffer = new Uint8[sdl_client.get_buffer_size()];
-  int buffer_len;
-  sdl_client.record(recording_buffer, buffer_len);
-  //sdl_client.save_wav_file("test.wav", recording_buffer, buffer_len);
+  //SdlClient sdl_client = SdlClient();
+  //Uint8* recording_buffer = new Uint8[sdl_client.get_buffer_size()];
+  //int buffer_len;
+  //sdl_client.record(recording_buffer, buffer_len);
+  ////sdl_client.save_wav_file("test.wav", recording_buffer, buffer_len);
 
-  WhisperClient whisper_client = WhisperClient();
-  std::string result = whisper_client.transcribe(recording_buffer, buffer_len);
-  std::cout << result << std::endl;
+  //WhisperClient whisper_client = WhisperClient();
+  //std::string result = whisper_client.transcribe(recording_buffer, buffer_len);
+  //std::cout << result << std::endl;
 
   // Initialize interaction loop
   std::cout << "Start interacting with the assistant:" << std::endl;

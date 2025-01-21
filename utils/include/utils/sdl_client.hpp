@@ -104,20 +104,19 @@ public:
 
     SDL_PauseAudioDevice(m_recording_device_id, SDL_FALSE);
 
-    bool recording_started = false;
+    //bool recording_started = false;
 
     while (true) {
+     // if (m_buffer_byte_position > 0 && !recording_started) {
+     //   recording_started = true;
+     //   std::cout << "INFO: recording started " << std::endl;
+     // }
+
+
       SDL_LockAudioDevice(m_recording_device_id);
-
-      if (m_buffer_byte_position > 0 && !recording_started) {
-        recording_started = true;
-        std::cout << "INFO: recording started " << std::endl;
-      }
-
       if (m_buffer_byte_position > m_buffer_byte_max_position) {
         m_final_buffer_position = m_buffer_byte_max_position;
         SDL_PauseAudioDevice(m_recording_device_id, SDL_TRUE);
-        SDL_UnlockAudioDevice(m_recording_device_id);
         break;
       }
 
@@ -125,14 +124,12 @@ public:
         std::cout << "INFO: recording stopped" << std::endl;
         m_final_buffer_position = m_buffer_byte_position;
         SDL_PauseAudioDevice(m_recording_device_id, SDL_TRUE);
-        SDL_UnlockAudioDevice(m_recording_device_id);
         break;
       }
-
       SDL_UnlockAudioDevice(m_recording_device_id);
+
       SDL_Delay(10);
     }
-
     SDL_UnlockAudioDevice(m_recording_device_id);
 
     recording_stop.join();
@@ -234,7 +231,7 @@ private:
   int m_final_buffer_position = 0;
 
   static void audio_recording_callback(void *userdata, Uint8 *stream, int len) {
-    // std::cout << "callback " << len << std::endl;
+    std::cout << "callback " << len << std::endl;
     auto *sdl_client = static_cast<SdlClient *>(userdata);
     sdl_client->process_recording_audio(stream, len);
   }
