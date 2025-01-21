@@ -14,7 +14,14 @@ else
     echo "$OPENWEATHER_KEY_FILE not found"
 fi
 
-MODEL_PATH="$HOME/cpp/piper/models/pl_PL-gosia-medium.onnx"
+NEWS_API_KEY_FILE="news_api.key"
+if test -f "$NEWS_API_KEY_FILE"; then
+    export NEWS_API_KEY=$(cat "$NEWS_API_KEY_FILE")
+else
+    echo "$NEWS_API_KEY_FILE not found"
+fi
+
+MODEL_PATH="$HOME/cpp/altenpfleger.ai/deps/piper/models/pl_PL-gosia-medium.onnx"
 if test -f "$MODEL_PATH"; then
     export MODEL_PATH="$MODEL_PATH"
 else

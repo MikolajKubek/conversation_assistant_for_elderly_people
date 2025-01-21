@@ -2,6 +2,7 @@
 #include "api_manager/wikipedia_api.hpp"
 #include "api_manager/reminder_api.hpp"
 #include "api_manager/routine_api.hpp"
+#include "api_manager/news_api.hpp"
 #include "interaction_db/interaction_db.hpp"
 #include "llm_interface/llm_interface.hpp"
 #include "prompt_processor/prompt_processor.hpp"
@@ -29,10 +30,12 @@ std::string loop_callback(std::string user_prompt,
   int interaction_counter = 0;
   auto processed_response = api_manager->handle_response(model_response);
   bool is_final = processed_response.is_final;
+  std::vector<std::pair<std::string, std::string>> followup_data;
   while (!is_final && interaction_counter < MAX_INTERACTOINS) {
+    followup_data.push_back(std::make_pair(processed_response.api_called, processed_response.api_response));
     interaction_counter++;
     user_prompt_wrapped = prompt_processor::render_followup_template(
-        user_prompt, processed_response.api_response, available_apis);
+        user_prompt, followup_data, available_apis);
     model_response = llm_interface->send_request(user_prompt_wrapped);
     processed_response = api_manager->handle_response(model_response);
     is_final = processed_response.is_final;
@@ -55,6 +58,7 @@ std::string get_env(std::string env_name) {
 int main() {
   std::string openai_key = get_env("OPENAI_KEY");
   std::string openweather_key = get_env("OPENWEATHER_KEY");
+  std::string news_api_key = get_env("NEWS_API_KEY");
 
   // Initialize gpt interface
   GptInterface gptInterface(openai_key);
@@ -67,7 +71,7 @@ int main() {
 
   std::shared_ptr<TaskScheduler> task_scheduler = std::make_shared<TaskScheduler>();
   task_scheduler->schedule_notification(1, "halo halo test");
-  task_scheduler->schedule_routine("0 30 * * * ?", 1, "test routine");
+  task_scheduler->schedule_routine("0 15 22 * * ?", 1, "test routine");
 
   // Initialize API manager
   auto api_manager = std::make_shared<ApiManager>();
@@ -76,6 +80,8 @@ int main() {
   std::unique_ptr<AssistantApi> date_api = std::make_unique<DateApi>();
   std::unique_ptr<AssistantApi> weather_api =
       std::make_unique<WeatherApi>(openweather_key);
+  std::unique_ptr<AssistantApi> news_api =
+      std::make_unique<NewsApi>(news_api_key);
   std::unique_ptr<AssistantApi> previous_context_api  = std::make_unique<PreviousContextApi>(interaction_db);
   std::unique_ptr<AssistantApi> wikipedia_api  = std::make_unique<WikipediaApi>();
   std::unique_ptr<AssistantApi> reminder_api = std::make_unique<ReminderApi>(task_scheduler);
@@ -84,6 +90,7 @@ int main() {
   api_manager->register_api("getTime", std::move(time_api));
   api_manager->register_api("getDate", std::move(date_api));
   api_manager->register_api("getWeather", std::move(weather_api));
+  api_manager->register_api("getNews", std::move(news_api));
   api_manager->register_api("getPreviousContext", std::move(previous_context_api));
   api_manager->register_api("getWikipediaArticle", std::move(wikipedia_api));
   api_manager->register_api("setReminder", std::move(reminder_api));

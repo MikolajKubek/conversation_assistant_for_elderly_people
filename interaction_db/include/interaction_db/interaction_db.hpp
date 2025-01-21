@@ -1,11 +1,11 @@
 #ifndef INTERACTION_DB_HPP
 #define INTERACTION_DB_HPP
 
+#include <chrono>
 #include <cstdlib>
 #include <cstring>
 #include <ctime>
 #include <iomanip>
-#include <chrono>
 #include <iostream>
 #include <sqlite3.h>
 #include <string>
@@ -63,8 +63,9 @@ public:
     std::stringstream ss;
     ss << std::put_time(std::localtime(&in_time_t), "%Y-%m-%d %X");
 
-    std::string sql("INSERT INTO INTERACTIONS(TIMESTAMP, SENDER, VALUE) VALUES(\"" +
-                    ss.str() + "\", \"" + sender + "\", \"" + value + "\");");
+    std::string sql(
+        "INSERT INTO INTERACTIONS(TIMESTAMP, SENDER, VALUE) VALUES(\"" +
+        ss.str() + "\", \"" + sender + "\", \"" + value + "\");");
     exit = sqlite3_exec(DB, sql.c_str(), NULL, 0, &message_error);
 
     if (exit != SQLITE_OK) {
@@ -83,36 +84,39 @@ public:
   std::vector<InteractionDbRecord> select(std::time_t time_threshold) {
     std::stringstream ss;
     ss << std::put_time(std::localtime(&time_threshold), "%Y-%m-%d %X");
-    std::string select_statement = "SELECT * FROM INTERACTIONS WHERE TIMESTAMP >= \"" + ss.str() + "\"";
-    std::cout << "Executing select statement: " << select_statement << std::endl;
+    std::string select_statement =
+        "SELECT * FROM INTERACTIONS WHERE TIMESTAMP >= \"" + ss.str() +
+        "\" ORDER BY ID DESC";
+    std::cout << "Executing select statement: " << select_statement
+              << std::endl;
 
     std::vector<InteractionDbRecord> results;
-    
-    char* message_error;
-    sqlite3_exec(DB, select_statement.c_str(), select_callback, &results, &message_error);
+
+    char *message_error;
+    sqlite3_exec(DB, select_statement.c_str(), select_callback, &results,
+                 &message_error);
 
     return results;
   }
 
 private:
   sqlite3 *DB;
-  static int select_callback(void *data, int argc, char **argv, char **azColName) {
+  static int select_callback(void *data, int argc, char **argv,
+                             char **azColName) {
     int i;
-    std::vector<InteractionDbRecord> *results = (std::vector<InteractionDbRecord>*)data;
+    std::vector<InteractionDbRecord> *results =
+        (std::vector<InteractionDbRecord> *)data;
     InteractionDbRecord record;
     for (i = 0; i < argc; i++) {
       if (strcmp(azColName[i], "TIMESTAMP") == 0) {
         std::cout << "received timestamp " << argv[i] << std::endl;
-      }
-      else if (strcmp(azColName[i], "SENDER") == 0) {
+      } else if (strcmp(azColName[i], "SENDER") == 0) {
         std::cout << "received sender name " << argv[i] << std::endl;
         record.sender = std::string(argv[i]);
-      }
-      else if (strcmp(azColName[i], "VALUE") == 0) {
+      } else if (strcmp(azColName[i], "VALUE") == 0) {
         std::cout << "received interaction value " << argv[i] << std::endl;
         record.value = std::string(argv[i]);
-      }
-      else {
+      } else {
         std::cerr << "received unexpected value from table ";
         std::cerr << argv[i] << std::endl;
       }
@@ -120,7 +124,8 @@ private:
     results->push_back(record);
     return 0;
   }
-  static int print_callback(void *data, int argc, char **argv, char **azColName) {
+  static int print_callback(void *data, int argc, char **argv,
+                            char **azColName) {
     int i;
     fprintf(stderr, "%s: ", (const char *)data);
 

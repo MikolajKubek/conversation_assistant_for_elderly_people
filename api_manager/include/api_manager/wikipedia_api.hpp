@@ -237,7 +237,7 @@ public:
   std::string get_command() override { return command; }
 
 private:
-  std::string m_language = "pl";
+  std::string m_language = "en";
   bool m_brief_response = true;
   CURL *m_curl;
   std::vector<std::string> m_params;

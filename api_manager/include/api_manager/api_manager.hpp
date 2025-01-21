@@ -196,7 +196,7 @@ public:
       std::cout << "not enough params" << std::endl;
       return "Error: not enough params. The API signature is " + command;
     }
-    std::string location = m_params[0].substr(0, m_params[0].length() - 1);
+    std::string location = m_params[0];
     std::string buffer;
     curl_easy_setopt(m_curl, CURLOPT_WRITEFUNCTION, write_callback);
     curl_easy_setopt(m_curl, CURLOPT_WRITEDATA, &buffer);
@@ -213,6 +213,9 @@ public:
 
     json response = json::parse(buffer);
     json response_filtered;
+    if (!response.contains("weather")) {
+      return response.dump(2);
+    }
     response_filtered["weather_description"] =
         response.at("weather")[0].at("description");
     response_filtered["temp"] = response.at("main").at("temp");
