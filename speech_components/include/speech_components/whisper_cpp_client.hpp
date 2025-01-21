@@ -31,6 +31,11 @@ public:
   ~WhisperClient() { whisper_free(m_ctx); }
 
   std::string transcribe(Uint8 *buffer, size_t buffer_len) override {
+    if (buffer_len <= 0) {
+      std::cout << "ERROR: empty audio buffer" << std::endl;
+      throw 111;
+    }
+
     std::vector<float> converted_data(buffer_len);
     convert_input_data(buffer, buffer_len, converted_data);
 

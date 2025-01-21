@@ -11,6 +11,7 @@ FetchContent_MakeAvailable(Catch2)
 
 # These tests can use the Catch2-provided main
 add_executable(tests test.cpp)
+set(ENV(TEST_DATA_DIR) ${PROJECT_SOURCE_DIR}/test_data)
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain
 	interaction_db_lib
 	api_manager_lib

@@ -7,8 +7,10 @@
 #include <catch2/catch_all.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include <catch2/matchers/catch_matchers_string.hpp>
+#include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <string>
 
 using Catch::Matchers::StartsWith;
 TEST_CASE("Call wikipedia api with empty params", "[wikipedia_api]") {
@@ -75,12 +77,12 @@ TEST_CASE("Read api params", "[utils]") {
 TEST_CASE("Use whisper to transcribe audio", "[speech_components]") {
   auto whisper_client = WhisperClient();
 
-  std::string wav_file_path = "/home/mikolaj/cpp/sdl_recording_test/build/recording.wav";
+  std::string wav_file_path = "what_time_pl.wav";
   Uint8* buffer;
   Uint32 buffer_len;
 
   auto sdl_client = SdlClient();
-  sdl_client.read_wav_file(wav_file_path, &buffer, buffer_len, 16000);
+  REQUIRE(sdl_client.read_wav_file(wav_file_path, &buffer, buffer_len, 16000) == 0);
 
   auto result = whisper_client.transcribe(buffer, buffer_len);
 
