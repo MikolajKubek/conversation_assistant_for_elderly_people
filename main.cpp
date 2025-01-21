@@ -5,6 +5,9 @@
 #include "llm_interface/llm_interface.hpp"
 #include "prompt_processor/prompt_processor.hpp"
 #include "task_scheduler/task_scheduler.hpp"
+#include "utils/sdl_client.hpp"
+#include "speech_components/whisper_cpp_client.hpp"
+#include <SDL_stdinc.h>
 #include <cstdlib>
 #include <iostream>
 #include <memory>
@@ -81,6 +84,16 @@ int main() {
   api_manager->register_api("getPreviousContext", std::move(previous_context_api));
   api_manager->register_api("getWikipediaArticle", std::move(wikipedia_api));
   api_manager->register_api("setReminder", std::move(reminder_api));
+
+  SdlClient sdl_client = SdlClient();
+  Uint8* recording_buffer = new Uint8[sdl_client.get_buffer_size()];
+  int buffer_len;
+  sdl_client.record(recording_buffer, buffer_len);
+  //sdl_client.save_wav_file("test.wav", recording_buffer, buffer_len);
+
+  WhisperClient whisper_client = WhisperClient();
+  std::string result = whisper_client.transcribe(recording_buffer, buffer_len);
+  std::cout << result << std::endl;
 
   // Initialize interaction loop
   std::cout << "Start interacting with the assistant:" << std::endl;

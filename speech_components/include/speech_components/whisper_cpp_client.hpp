@@ -53,8 +53,8 @@ public:
       std::string segment_text(text);
       ltrim(segment_text);
 
-      if (!isalpha(segment_text[0])) {
-        std::cout << "WARN: segment doesn't start with a letter, segment: "
+      if (segment_text.length() > 0 && segment_text[0] == '[') {
+        std::cout << "WARN: segment starts with a '[' and will be skipped, segment: "
                   << segment_text << std::endl;
         continue;
       }
