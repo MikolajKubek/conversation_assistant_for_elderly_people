@@ -21,7 +21,9 @@
 
 std::string loop_callback(std::string user_prompt,
                           std::shared_ptr<GptInterface> llm_interface,
-                          std::shared_ptr<ApiManager> api_manager) {
+                          std::shared_ptr<ApiManager> api_manager,
+                          std::vector<std::string> user_data) {
+  std::cout << "user data size: " <<  user_data.size() << std::endl;
   std::vector<std::string> available_apis = api_manager->get_apis();
   std::string user_prompt_wrapped =
       prompt_processor::render_template(user_prompt, available_apis);
@@ -56,6 +58,11 @@ std::string get_env(std::string env_name) {
 }
 
 int main() {
+  std::vector<std::string> user_data = {
+    "user's primary language is polish",
+    "user is based in Warsaw",
+    "user prefers short and concise responses"
+  };
   std::string openai_key = get_env("OPENAI_KEY");
   std::string openweather_key = get_env("OPENWEATHER_KEY");
   std::string news_api_key = get_env("NEWS_API_KEY");
@@ -131,7 +138,7 @@ int main() {
         std::cout << notification << std::endl;
       }
     }
-    std::cout << loop_callback(prompt, interface_ptr, api_manager) << std::endl;
+    std::cout << loop_callback(prompt, interface_ptr, api_manager, user_data) << std::endl;
   }
 
   return 0;

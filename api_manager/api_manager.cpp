@@ -74,9 +74,15 @@ HandleResponseResult
 ApiManager::handle_response(std::string model_response) {
   bool is_final = false;
   std::string api_data;
+  std::string data_learned = "";
 
   json response_json = json::parse(model_response);
   response_json.at("apiToCall").get_to(api_data);
+  if (response_json.at("dataLearned").is_string()) {
+    data_learned = response_json.at("dataLearned").get<std::string>();
+  } else if (response_json.at("dataLearned").is_object() && !response_json.at("dataLearned").empty()) {
+    response_json.at("dataLearned").dump();
+  }
 
   std::cout << "got response: " << api_data << std::endl;
 
@@ -87,7 +93,7 @@ ApiManager::handle_response(std::string model_response) {
   auto assistant_iterator = m_api_registry.find(api_name);
   if (assistant_iterator == m_api_registry.end()) {
     std::cout << "Suitable api not available" << std::endl;
-    return HandleResponseResult(api_name, "Requested api wasn't found", true);
+    return HandleResponseResult(api_name, "Requested api wasn't found", "", true);
   }
 
   assistant_iterator->second->set_params(api_params);
@@ -96,5 +102,5 @@ ApiManager::handle_response(std::string model_response) {
     is_final = true;
   }
 
-  return HandleResponseResult(api_name, response, is_final);
+  return HandleResponseResult(api_name, response, data_learned, is_final);
 }

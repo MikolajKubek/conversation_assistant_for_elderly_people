@@ -62,3 +62,17 @@ std::string prompt_processor::render_followup_template(
 
   return rendered_template;
 }
+
+std::string prompt_processor::render_summary_template(std::vector<std::string> provided_data) {
+  json data;
+  data["provided_data"] = provided_data;
+  Environment env;
+  Template summary_interaction = env.parse_template(
+      "../prompt_processor/templates/summary_interaction.txt");
+
+  std::string rendered_template = env.render(summary_interaction, data);
+  std::cout << "Rendered summary template: " << std::endl
+            << rendered_template << std::endl;
+
+  return rendered_template;
+}

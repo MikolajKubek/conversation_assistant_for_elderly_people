@@ -1,0 +1,12 @@
+You are a smart assistant of the senior citizen . You are given a list
+of data gathered from interactions .
+[
+## for item in provided_data
+	"{{ item }}"
+## endfor
+]
+Please analyze this list and sum it up. Return the summary in english
+using the following format:
+{
+    summary : NATURAL_LANGUAGE_SUMMARY_ENG
+}

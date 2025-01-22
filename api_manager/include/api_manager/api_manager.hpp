@@ -31,12 +31,13 @@ private:
 struct HandleResponseResult {
   std::string api_called;
   std::string api_response;
+  std::string data_learned;
   bool is_final;
 
   HandleResponseResult(std::string api_called, std::string api_response,
-                       bool is_final)
-      : api_called(api_called), api_response(api_response), is_final(is_final) {
-  }
+                       std::string data_learned, bool is_final)
+      : api_called(api_called), api_response(api_response),
+        data_learned(data_learned), is_final(is_final) {}
 };
 
 class ApiManager {
