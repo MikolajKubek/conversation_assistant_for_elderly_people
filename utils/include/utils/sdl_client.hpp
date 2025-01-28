@@ -231,7 +231,7 @@ private:
   int m_final_buffer_position = 0;
 
   static void audio_recording_callback(void *userdata, Uint8 *stream, int len) {
-    std::cout << "callback " << len << std::endl;
+    //std::cout << "callback " << len << std::endl;
     auto *sdl_client = static_cast<SdlClient *>(userdata);
     sdl_client->process_recording_audio(stream, len);
   }
