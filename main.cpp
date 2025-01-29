@@ -176,19 +176,21 @@ int main(int argc, char *argv[]) {
     while (true) {
       Uint8 *recording_buffer = new Uint8[sdl_client.get_buffer_size()];
       int buffer_len;
-      sdl_client.record(recording_buffer, buffer_len);
+      int recording_result = sdl_client.record(recording_buffer, buffer_len);
       // sdl_client.save_wav_file("test.wav", recording_buffer, buffer_len);
 
-      std::string prompt =
-          whisper_client.transcribe(recording_buffer, buffer_len);
-      std::cout << prompt << std::endl;
+      if (recording_result == EXIT_SUCCESS) {
+        std::string prompt =
+            whisper_client.transcribe(recording_buffer, buffer_len);
+        std::cout << prompt << std::endl;
 
-      if (prompt.size() > 0) {
-        std::cout << loop_callback(prompt, interface_ptr, api_manager,
-                                   user_data)
-                  << std::endl;
-      } else {
-        std::cout << "in audio was empty" << std::endl;
+        if (prompt.size() > 0) {
+          std::cout << loop_callback(prompt, interface_ptr, api_manager,
+                                     user_data)
+                    << std::endl;
+        } else {
+          std::cout << "in audio was empty" << std::endl;
+        }
       }
 
       std::cout << "Press any key to start recording, press ESC to exit"
