@@ -43,6 +43,6 @@ export ESPEAK_DATA_PATH=/usr/lib/aarch64-linux-gnu/espeak-ng-data
 ```
 
 ## Demos
-- videos presenting interactions with the system
-    - [Która jest godzina?](https://youtube.com/shorts/E2_d_ra0lQs?feature=share)
-    - [Jak mam się dzisiaj ubrać?](https://youtube.com/shorts/Y4UXjJyt2A0?feature=share)
+- Videos presenting interactions with the system
+    - [Która jest godzina?](https://youtube.com/shorts/E2_d_ra0lQs?feature=share), ([version without cut](https://youtube.com/shorts/bExKkrKoZL8))
+    - [Jak mam się dzisiaj ubrać?](https://youtube.com/shorts/Y4UXjJyt2A0?feature=share), ([version without cut](https://youtube.com/shorts/U-QJSh-cbgA?feature=share))
