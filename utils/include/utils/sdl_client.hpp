@@ -99,6 +99,7 @@ public:
     m_final_buffer_position = 0;
 
     std::cout << "Start recording. Press any key to interrupt" << std::endl;
+    stop_recording = false;
     std::thread recording_stop(&SdlClient::listen_for_recording_interrupt,
                                this);
 

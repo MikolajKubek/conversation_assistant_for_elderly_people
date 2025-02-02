@@ -164,14 +164,8 @@ int main(int argc, char *argv[]) {
     std::cout << "voice interface" << std::endl;
     char key;
     SdlClient sdl_client = SdlClient();
-    // Uint8* recording_buffer = new Uint8[sdl_client.get_buffer_size()];
-    // int buffer_len;
-    // sdl_client.record(recording_buffer, buffer_len);
-    // sdl_client.save_wav_file("test.wav", recording_buffer, buffer_len);
 
     WhisperClient whisper_client = WhisperClient();
-    // std::string result = whisper_client.transcribe(recording_buffer,
-    // buffer_len); std::cout << result << std::endl;
 
     while (true) {
       Uint8 *recording_buffer = new Uint8[sdl_client.get_buffer_size()];
@@ -185,6 +179,7 @@ int main(int argc, char *argv[]) {
         std::cout << prompt << std::endl;
 
         if (prompt.size() > 0) {
+          interaction_db->insert("user", prompt);
           std::cout << loop_callback(prompt, interface_ptr, api_manager,
                                      user_data)
                     << std::endl;

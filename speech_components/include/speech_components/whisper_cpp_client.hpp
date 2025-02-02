@@ -67,7 +67,8 @@ public:
 
 private:
   std::string m_model_path =
-      "/home/mikolaj/cpp/altenpfleger.ai/deps/whisper.cpp/models/ggml-base.bin";
+      //"/home/mikolaj/cpp/altenpfleger.ai/deps/whisper.cpp/models/ggml-base.bin";
+      "/home/mikolaj/cpp/altenpfleger.ai/deps/whisper.cpp/models/ggml-tiny.bin";
   std::string m_lang = "pl";
   whisper_context *m_ctx;
   whisper_full_params m_params;
