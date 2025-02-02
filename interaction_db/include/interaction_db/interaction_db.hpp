@@ -86,7 +86,7 @@ public:
     ss << std::put_time(std::localtime(&time_threshold), "%Y-%m-%d %X");
     std::string select_statement =
         "SELECT * FROM INTERACTIONS WHERE TIMESTAMP >= \"" + ss.str() +
-        "\" LIMIT 10 ";//OFFSET 1";
+        "\" ORDER BY ID DESC LIMIT 10 ";//OFFSET 1";
     std::cout << "Executing select statement: " << select_statement
               << std::endl;
 

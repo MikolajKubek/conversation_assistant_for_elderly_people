@@ -264,7 +264,9 @@ public:
 
     std::vector<InteractionDbRecord> records =
         m_database_context->select(time_threshold_time_t);
-    for (InteractionDbRecord record : records) {
+    for (int i = records.size() - 1; i >= 0; i--) {
+      InteractionDbRecord record = records[i];
+    //for (InteractionDbRecord record : records) {
       std::string history_entry;
       if (record.sender == "user") {
         history_entry = "prompt: " + record.value;

@@ -44,5 +44,7 @@ export ESPEAK_DATA_PATH=/usr/lib/aarch64-linux-gnu/espeak-ng-data
 
 ## Demos
 - Videos presenting interactions with the system
+    - [Dyskusja o Warszawie; Lenovo y520; whisper ggml-tiny](https://youtu.be/GZsuQkUq65w)
+    - [Powiedz mi coś ciekawego; Raspberry Pi; whisper ggml-tiny](https://youtu.be/BVK6LL-_ECM)
     - [Która jest godzina?](https://youtube.com/shorts/E2_d_ra0lQs?feature=share), ([version without cut](https://youtube.com/shorts/bExKkrKoZL8))
     - [Jak mam się dzisiaj ubrać?](https://youtube.com/shorts/Y4UXjJyt2A0?feature=share), ([version without cut](https://youtube.com/shorts/U-QJSh-cbgA?feature=share))
