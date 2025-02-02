@@ -1,8 +1,11 @@
 # LLM-based conversation assistant
 
 ## Prerequisites
-### Piper
-### OpenAI API
+- whisper.cpp: https://github.com/ggerganov/whisper.cpp
+- piper: https://github.com/rhasspy/piper
+- OpenAI API (or other OpenAI compatible like Grok or Deepseek)
+- OpenWeather API: https://openweathermap.org/
+- News API: https://newsapi.org/
 
 ## Installation
 1. Build CMake project
